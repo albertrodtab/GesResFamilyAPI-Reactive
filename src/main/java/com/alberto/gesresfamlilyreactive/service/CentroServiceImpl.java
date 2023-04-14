@@ -2,14 +2,14 @@ package com.alberto.gesresfamlilyreactive.service;
 
 import com.alberto.gesresfamlilyreactive.domain.Centro;
 //import com.alberto.gesresfamily.exception.CentroNotFoundException;
+import com.alberto.gesresfamlilyreactive.exception.CentroNotFoundException;
 import com.alberto.gesresfamlilyreactive.repository.CentroRepository;
 //import org.modelmapper.ModelMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 
 @Service
@@ -29,9 +29,53 @@ public class CentroServiceImpl implements CentroService {
     }
 
     @Override
+    public Mono<Centro> findById(String id) throws CentroNotFoundException{
+        return centroRepository.findById(id)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new CentroNotFoundException())));
+    }
+
+    @Override
     public Mono<Centro> addCentro(Centro centro) {
         return centroRepository.save(centro);
     }
+
+    @Override
+    public Mono<Centro> removeCentro(String id) throws CentroNotFoundException{
+        Mono<Centro> centro = centroRepository.findById(id)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new CentroNotFoundException())));
+        //orElseThrow(CentroNotFoundException::new);
+        centroRepository.deleteById(id).block();
+        return centro;
+    }
+
+    @Override
+    public Mono<Centro> modifyCentro(String id, Centro newCentro) throws CentroNotFoundException {
+        Mono<Centro> existingCentro = centroRepository.findById(id)
+                .switchIfEmpty(Mono.defer(()-> Mono.error(new CentroNotFoundException())));
+                //orElseThrow(CentroNotFoundException::new);
+        /*
+         *ToDo Con ModelMapper evito escribir todos los getters y setters pero debo incluir el id tambien en Json
+         * para que realice la modificación sobre el existente sin crear uno nuevo.
+         * revisar como evitar esto.
+         */
+        Centro centro = existingCentro.block();
+        /*centro.setNombre(newCentro.getNombre());
+        centro.setDireccion(newCentro.getDireccion());
+        centro.setNumRegistro(newCentro.getNumRegistro());
+        centro.setEmail(newCentro.getEmail());
+        centro.setTelefono(newCentro.getTelefono());*/
+        ModelMapper mapper = new ModelMapper();
+        centro = mapper.map(newCentro, Centro.class);
+        return centroRepository.save(centro);
+    }
+
+/*    @Override
+    public Mono<Centro> removeCentro(String id) {
+        Mono<Centro> centro = centroRepository.findById(id);
+                //orElseThrow(CentroNotFoundException::new);
+        centroRepository.delete(centro);
+        return centro;
+    }*/
 
     /*@Override
     public Centro addCentro(Centro centro) {

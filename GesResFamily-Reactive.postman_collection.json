@@ -1,0 +1,137 @@
+{
+	"info": {
+		"_postman_id": "342e5fb5-f1ad-453a-a3f2-0aa80e582362",
+		"name": "GesResFamily-Reactive",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18150094"
+	},
+	"item": [
+		{
+			"name": "addCentro",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nombre\": \"{{$randomCompanyName}}\",\r\n    \"direccion\": \"{{$randomStreetAddress}}\",\r\n    \"numRegistro\": \"R{{$randomInt}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"telefono\": \"{{$randomPhoneNumber}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/centros",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"centros"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getCentros",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/centros",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"centros"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "consultCentroById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/centro/64393136d3ed6c6ec1289153",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"centro",
+						"64393136d3ed6c6ec1289153"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteCentro",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/centro/64393358d3ed6c6ec1289156",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"centro",
+						"64393358d3ed6c6ec1289156"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateCentro",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n    \"id\": \"64386c77d3ed6c6ec1289152\",\r\n    \"nombre\": \"Centro residencial Lalin\",\r\n    \"direccion\": \"Filgueiroa, Nº 60, Donramiro, Lalín\",\r\n    \"numRegistro\": \"G698745\",\r\n    \"email\": \"centrodia.lalin@alberto.com\",\r\n    \"telefono\": \"700623180\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/centro/64386c77d3ed6c6ec1289152",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"centro",
+						"64386c77d3ed6c6ec1289152"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

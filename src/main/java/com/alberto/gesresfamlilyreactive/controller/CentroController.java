@@ -2,6 +2,8 @@ package com.alberto.gesresfamlilyreactive.controller;
 
 import com.alberto.gesresfamlilyreactive.domain.Centro;
 //import com.alberto.gesresfamlilyreactive.exception.*;
+import com.alberto.gesresfamlilyreactive.exception.CentroNotFoundException;
+import com.alberto.gesresfamlilyreactive.exception.ErrorResponse;
 import com.alberto.gesresfamlilyreactive.service.CentroService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 //import javax.validation.Valid;
 import java.time.Duration;
@@ -31,22 +34,21 @@ public class CentroController {
 
 
     @PostMapping("/centros")
-    public void addCentro ( @RequestBody Centro centro) {
+    public ResponseEntity<?> addCentro ( @RequestBody Centro centro) {
         logger.info("Inicio addCentro");
-        //Centro newCentro = centroService.addCentro(centro);
+        Mono<Centro> newCentro = centroService.addCentro(centro);
         logger.info("Fin addCentro");
         //return ResponseEntity.status(HttpStatus.CREATED).body(newCentro);
-        centroService.addCentro(centro).block();
-
+        return ResponseEntity.ok(newCentro.block());
     }
 
-    /*@GetMapping("/centro/{id}")
-    public ResponseEntity<Centro> getCentro (@PathVariable long id) throws CentroNotFoundException {
+    @GetMapping("/centro/{id}")
+    public Mono<Centro> getCentro (@PathVariable String id) throws CentroNotFoundException {
         logger.info("Inicio getCentro");
-        Centro centro = centroService.findById(id);
+        Mono<Centro> centro = centroService.findById(id);
         logger.info("Fin getCentro");
-        return ResponseEntity.ok(centro);
-    }*/
+        return centro.delayElement(Duration.ofSeconds(1));
+    }
 
     @GetMapping(value = "/centros", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Centro> getCentros(
@@ -54,35 +56,38 @@ public class CentroController {
             @RequestParam(name = "numRegistro", required = false, defaultValue = "") String numRegistro,
             @RequestParam(name = "email", required = false, defaultValue = "") String email){
         logger.info("Inicio getCentros");
-        List<Centro> centros;
+        Flux<Centro> centros = null;
 
        if(nombre.equals("") && numRegistro.equals("") && email.equals("")){
             logger.info("Muestra todos los centros");
-            //centros = centroService.findAll();
+            centros = centroService.findAll().delayElements(Duration.ofSeconds(3));
         } else {
             logger.info("Muestra centros que cumplen los parametros");
             //centros = centroService.findAllCentros(nombre, numRegistro, email);
         }
         logger.info("Fin getCentros");
-        return centroService.findAll().delayElements(Duration.ofSeconds(3));
+        return centros;
     }
 
-    /*@DeleteMapping("/centro/{id}")
-    public ResponseEntity<Void> removeCentro(@PathVariable long id) throws CentroNotFoundException {
+
+    @DeleteMapping("/centro/{id}")
+    public ResponseEntity<Void> removeCentro(@PathVariable String id) throws CentroNotFoundException {
         logger.info("Inicio removeCentro");
-        centroService.removeCentro(id);
+        Mono<Centro> centro = centroService.removeCentro(id);
         logger.info("Fin removeCentro");
         return ResponseEntity.noContent().build();
-    }*/
+    }
 
-    /*@PutMapping("/centro/{id}")
-    public ResponseEntity<Centro> modifyCentro(@RequestBody Centro centro, @PathVariable long id)
+
+
+    @PutMapping("/centro/{id}")
+    public Mono<Centro> modifyCentro(@RequestBody Centro centro, @PathVariable String id)
             throws CentroNotFoundException{
         logger.info("Inicio modifyCentro");
-        Centro newCentro = centroService.modifyCentro(id, centro);
+        Mono<Centro> newCentro = centroService.modifyCentro(id, centro);
         logger.info("Fin modifyCentro");
-        return ResponseEntity.status(HttpStatus.OK).body(newCentro);
-    }*/
+        return ResponseEntity.status(HttpStatus.OK).body(newCentro).getBody();
+    }
 
     // Cambiar el telefono de un centro
     /*@PatchMapping("/centro/{id}")
@@ -126,13 +131,13 @@ public class CentroController {
         return ResponseEntity.badRequest().body(ErrorResponse.badRequest(bre.getMessage()));
     }*/
 
-   /* @ExceptionHandler(CentroNotFoundException.class)
+    @ExceptionHandler(CentroNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleCentroNotFoundException(CentroNotFoundException cnfe) {
         logger.error(cnfe.getMessage(), cnfe);
         logger.error(Arrays.toString(cnfe.getStackTrace()));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.resourceNotFound(cnfe.getMessage()));
     }
-*/
+
     /*@ExceptionHandler(InternalServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleInternalServerErrorException(InternalServerErrorException isee) {
         logger.error(isee.getMessage(), isee);

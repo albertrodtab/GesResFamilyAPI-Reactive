@@ -2,6 +2,7 @@ package com.alberto.gesresfamlilyreactive.service;
 
 
 import com.alberto.gesresfamlilyreactive.domain.Centro;
+import com.alberto.gesresfamlilyreactive.exception.CentroNotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 //import com.alberto.gesresfamily.exception.CentroNotFoundException;
@@ -14,7 +15,13 @@ public interface CentroService {
     Flux<Centro> findAll();
     Mono<Centro> findByNombre(String nombre);
 
+    Mono<Centro> findById(String id) throws CentroNotFoundException;
+
     Mono<Centro> addCentro(Centro centro);
+
+    Mono<Centro> modifyCentro(String id, Centro centro) throws CentroNotFoundException;
+
+    Mono<Centro> removeCentro(String id) throws CentroNotFoundException;
 
     /*Centro addCentro(Centro centro);
 
